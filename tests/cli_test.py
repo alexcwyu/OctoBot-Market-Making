@@ -28,5 +28,5 @@ def test_start_octobot_with_market_making_config():
         repo_path = pathlib.Path(__file__).parent.parent.absolute()
         # ensure octobot cli can be imported and is called with octobot_market_making default config
         assert octobot_main_mock.mock_calls[0].kwargs["default_config_file"].replace("\\", "/") == str(
-            repo_path.joinpath("octobot_market_making/config/default_config.json")
+            repo_path.joinpath("src/octobot_market_making/config/default_config.json")
         ).replace("\\", "/")

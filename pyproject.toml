@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "octobot[full]==2.1.1",
+    "octobot[full]",
 ]
 
 [project.scripts]
@@ -32,7 +32,13 @@ Homepage = "https://github.com/Drakkar-Software/OctoBot-Market-Making"
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-timeout",
+    "pytest-xdist",
+    "mock",
+    "ruff",
 ]
 
 [tool.uv]
@@ -67,3 +73,6 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 xfail_strict = true
 filterwarnings = ["error"]
+
+[tool.uv.sources]
+"octobot" = { path = "../OctoBot", editable = true }

@@ -149,4 +149,6 @@ See [GPL-3.0 LICENSE](https://github.com/Drakkar-Software/OctoBot-Market-Making/
 
 
 ## Give a boost to OctoBot Market Making
-Do you like what we are building with OctoBot Market Making? Consider giving us a star ⭐ to boost the project's visibility! 
+Do you like what we are building with OctoBot Market Making? Consider giving us a star ⭐ to boost the project's visibility!
+
+Development documentation: [architecture and workflows](docs/ayu-develop.md) ([HTML](docs/ayu-develop.html)), [uv development](docs/development.md), and [validation evidence](docs/validation.md).
