@@ -76,3 +76,4 @@ filterwarnings = ["error"]
 
 [tool.uv.sources]
 "octobot" = { path = "../OctoBot", editable = true }
+"octobot-tulipy" = { path = "../OctoBot/vendor/octobot-tulipy" }
