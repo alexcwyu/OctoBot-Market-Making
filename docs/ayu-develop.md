@@ -1,136 +1,161 @@
-# OctoBot-Market-Making: architecture and development
+# OctoBot-Market-Making: workflow, design and architecture
 
-Market Making is a small OctoBot distribution launcher. It chooses a default distribution/profile configuration and delegates the runtime to OctoBot; the quoting algorithms live in tentacles and the shared trading runtime.
+Updated: **2026-10-13**
+Reviewed Git hash: `21e0d4c21b4f6460e36113d5254cab55a22108ec`
+Branch: `feature/ayu_develop`
+Source diff SHA256: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+Scope: **Distribution / configuration companion** / Maintenance: **companion**
+Languages: Python
 
-## Components and boundaries
+[HTML edition](ayu-develop.html) / [Development](development.md) / [Historical validation](validation.md) / [Full system comparison](../../docs/index.html)
 
-The console entry point forwards command-line arguments and a package-local default_config_file to octobot.cli.main. Constants resolve resources relative to __file__, which keeps configuration discoverable after src-layout installation. The distribution configuration selects services, exchange settings, and market-making profile behavior. Container launch files provide another entry point into the same application.
+## Purpose and scope
 
+Launch the OctoBot host with the market_making distribution and selected profile; this repository does not contain the market-making order engine.
+
+## Features and support boundaries
+
+Native = implemented here. Integration = supplied through a named host/API. Limited = material restriction. Not provided = evidenced scope exclusion. Unverified = support/absence not established. Not applicable = outside this artifact type.
+
+| Capability | Status | Implementation and limits | Source |
+|---|---|---|---|
+| Backtesting | Unverified | Packaged config contains an empty backtesting file list, which does not prove replay support for the selected market-making profile. Wrapper source only delegates startup to OctoBot; profile backtestability is not established here. | [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) / [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) |
+| Live execution | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Paper trading | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Event driven | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Vectorized | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Order management | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Order types | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Multi venue | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Crypto | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Equities | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Futures | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Options | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Forex | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Strategy api | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Optimization | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Machine learning | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Reinforcement learning | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Portfolio | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Risk management | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Performance analytics | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Historical data | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Streaming data | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Persistence | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Data pipeline | Unverified | Representative source review did not establish this capability; no claim of absence. | Not applicable to this repository scope. |
+| Web ui | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Cli | Native | Distribution provides a CLI wrapper with packaged config resources. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21)) |
+| Monitoring | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Extension api | Integration | Supplied by external OctoBot host and activated market_making profile/tentacles; local code only delegates startup. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+| Native acceleration | Unverified | No local implementation evidence; host capabilities cannot be inferred from distribution label. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) |
+| Distributed execution | Unverified | No local implementation evidence; host capabilities cannot be inferred from distribution label. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) |
+
+## System components
+
+| Component | Responsibility | Source |
+|---|---|---|
+| Distribution launcher | Delegate startup arguments and default config to OctoBot host. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) |
+| Packaged configuration | Select market_making profile/distribution and web notification preferences. | [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) / [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21)) |
+
+## Architecture and component boundaries
+
+The component view summarizes inspected responsibility boundaries. Arrows identify the documented API/data dependencies; this is not a deployment-readiness claim.
 
 ```mermaid
 flowchart LR
-  A0["Distribution CLI"]
-  A1["Bundled JSON config"]
-  A2["OctoBot launcher"]
-  A3["Market-making tentacles"]
-  A4["Exchange execution"]
-  A0 --> A1
-  A1 --> A2
-  A2 --> A3
-  A3 --> A4
+  N0["Distribution launcher"]
+  N1["Packaged configuration"]
+  N0 -->|"Passes DEFAULT_CONFIG_FILE to host CLI."| N1
 ```
 
-The following class view names implementation classes. Cross-package types are supplied by the host ecosystem; arrows describe inheritance or usage, not copied ownership.
+- Passes DEFAULT_CONFIG_FILE to host CLI.: [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21))
+
+## Design decisions
+
+| Decision | Rationale | Tradeoff | Evidence |
+|---|---|---|---|
+| Implement distribution as host CLI/config adapter. | Reuse OctoBot runtime while selecting market-making defaults. | Strategy availability/version and actual connector behavior depend on host/tentacles installation. | [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) |
+
+## Class and interface relationships
 
 ```mermaid
 classDiagram
-  class OctoBot
-  class ConfigurationManager
-  class Initializer
-  class TaskManager
-  OctoBot --> ConfigurationManager : shared runtime
-  OctoBot --> Initializer : shared runtime
-  OctoBot --> TaskManager : shared runtime
+  class N0["main"] {
+    <<function>>
+  }
+  class N1["constants"] {
+    <<module>>
+  }
 ```
 
-## Runtime workflow
+Each node is a reviewed source symbol. Function/module nodes are explicitly labeled; they do not imply Python classes. Only reviewed relationships are drawn.
 
-Launch the distribution entry point, resolve bundled JSON configuration, forward arguments to OctoBot, load the selected profile/plugins, initialize exchange producers and trading modes, then run their asynchronous lifecycle. Backtesting and paper-trading behavior are delegated to OctoBot.
+- **main** (function): [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22))
+- **constants** (module): [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21))
 
+## Workflow
 
-```mermaid
-sequenceDiagram
-  participant Caller
-  participant P1 as Bundled JSON config
-  participant P2 as OctoBot launcher
-  participant P3 as Market-making tentacles
-  Caller->>P1: Configure context and inputs
-  P1->>P2: Initialize owned components
-  P2->>P3: Process observation or command
-  P3-->>P2: Result and state update
-  P2-->>Caller: Report or event
-  Caller->>P1: Stop and release resources
-```
+### Market-making distribution startup
 
-This sequence is an architectural view of responsibility and resource ownership. Individual plugin, connector, and strategy implementations can add asynchronous events and error branches. The lifecycle below is a conceptual operating workflow, rather than a claim that every component has one shared state enum.
-
-```mermaid
-stateDiagram-v2
-  [*] --> Configured
-  Configured --> Initialized: validate inputs
-  Initialized --> Processing: start
-  Processing --> Processing: next data or event
-  Processing --> Stopping: finish or cancel
-  Initialized --> Stopping: initialization error
-  Stopping --> Closed: release owned resources
-  Closed --> [*]
-```
-
-## Features and extension points
-
-Packaged market-making defaults; command-line launcher; Docker/Compose deployment examples; profile-driven quoting configuration; inherited OctoBot simulation and services.
-
-Extend the owning component behind its existing public interface. Keep metadata and configuration alongside plugin/strategy resources. Exchange-specific behavior belongs in an adapter; strategy decisions belong in the strategy/evaluator layer; persistence schema and migrations belong with the storage implementation. Review the source map below before changing a boundary, and exercise the existing tests associated with that boundary.
-
-## Packaging and dependency design
-
-The class diagram names externally owned OctoBot classes; this repository defines no independent runtime classes. The sibling OctoBot uv source ensures the launcher is checked against the merged core rather than an old published wheel. Bundled resource paths remain package-relative.
-
-The lock records exact package versions, hashes, platform markers, and local source mappings. Path sources deliberately bind related repositories in this workspace; clone sibling repositories at the documented names before synchronization. Published packaging metadata describes public dependencies, while uv source settings select this development workspace. Resolve dependency changes with uv lock --upgrade and retain the generated lock, then verify the same locked environment.
-
-```mermaid
-flowchart LR
-  Source["src/octobot_market_making"] --> Backend["PEP 517 build backend"]
-  Metadata["pyproject.toml"] --> Backend
-  Lock["uv.lock"] --> Env["Managed Python environment"]
-  Backend --> Wheel["Wheel and sdist"]
-  Env --> Existing["Existing tests"]
-  Source --> Existing
-  Wheel --> Inspect["Inspect modules and resources"]
-```
-
-## Maintenance workflow
-
-All upstream branches and tags are fetched. Fork updates use nonforce pushes; a divergent branch is merged without erasing fork history. The default branch is merged into feature/ayu_develop with package/resource conflicts reconciled in their installed locations. Build and test evidence is recorded before a local maintenance commit. Feature branch publication is a separate root-level action.
+External OctoBot host and installed tentacles perform exchange setup, strategy execution, simulator and UI. No local matching or market-making algorithm call chain is claimed.
 
 ```mermaid
 flowchart TD
-  F["Fetch upstream branches and tags"] --> C["Compare fork refs"]
-  C --> M["Nonforce ref sync and default merge"]
-  M --> L["uv lock --upgrade"]
-  L --> P["Try managed Python 3.15"]
-  P --> Q{"All required dependencies build?"}
-  Q -->|yes| S["Sync complete environment"]
-  Q -->|no| B["Record evidence and select supported fallback"]
-  B --> S
-  S --> W["Build wheel and sdist"]
-  W --> T["Run existing tests and compile"]
-  T --> R["Record failures, fixes, and exact results"]
-  R --> D["Render MD and HTML documentation"]
-  D --> G["Commit locally on feature/ayu_develop"]
+  W0["Load packaged profile/distribution defaults."]
+  W1["Forward user arguments and defaults to octobot.cli.main."]
+  W0 --> W1
 ```
 
-No existing test assertions are removed and no new test cases are introduced in this maintenance pass. Corrected fixtures preserve coverage while making paths, corruption inputs, and resource cleanup compatible with the selected interpreter. A failed test or unsupported dependency is reported explicitly in [validation](validation.md); package build success does not imply strategy correctness, profitability, or successful live connectivity.
+1. Load packaged profile/distribution defaults.. [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) / [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21))
+2. Forward user arguments and defaults to octobot.cli.main.. [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22))
+
+## Sequence
+
+Delegated launch
+
+Host participant is external to this repository; source proves delegation, not the host algorithm internals.
+
+```mermaid
+sequenceDiagram
+  participant N0 as Distribution main
+  participant N1 as External OctoBot CLI
+  N0->>N1: main(sys.argv[1:], default_config_file=DEFAULT_CONFIG_FILE)
+```
+
+- main(sys.argv[1:], default_config_file=DEFAULT_CONFIG_FILE): [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22))
+
+## Strengths and limits
+
+### Strengths
+
+- Small adapter keeps host lifecycle and packaged resource location explicit. [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21))
+
+### Limitations
+
+- Market-making strategy code, supported order semantics and exchange readiness are not implemented in this distribution package. [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) / [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23))
+
+## Validation scope
+
+The linked validation and command records preserve actual historical runs and user-authorized exclusions. This source/document review does not rerun application tests, establish live trading readiness or rank benchmark performance. Current data, credential and runtime prerequisites remain material.
+
+[Repository validation](validation.md) / [Executed checks](maintenance/index.md)
 
 ## Source map
 
-| Source | Responsibility and location |
-| --- | --- |
-| [cli.py](../src/octobot_market_making/cli.py) | src/octobot_market_making/cli.py |
-| [constants.py](../src/octobot_market_making/constants.py) | src/octobot_market_making/constants.py |
-| [__init__.py](../src/octobot_market_making/__init__.py) | src/octobot_market_making/__init__.py |
-| [default_config.json](../src/octobot_market_making/config/default_config.json) | src/octobot_market_making/config/default_config.json |
-| [README.md](../src/octobot_market_making/README.md) | src/octobot_market_making/README.md |
-| [start.py](../start.py) | start.py |
-| [Dockerfile](../Dockerfile) | Dockerfile |
-| [docker-compose.yml](../docker-compose.yml) | docker-compose.yml |
-| [cli_test.py](../tests/cli_test.py) | tests/cli_test.py |
-| [pyproject.toml](../pyproject.toml) | pyproject.toml |
-| [README.md](../README.md) | README.md |
-| [uv.lock](../uv.lock) | uv.lock |
+| Reviewed symbol/path | Inspected responsibility | Actual file SHA256 |
+|---|---|---|
+| [main](../src/octobot_market_making/cli.py) ([L22](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/cli.py#L22)) | Passes sys.argv[1:] and packaged DEFAULT_CONFIG_FILE into octobot.cli.main. | `e3f423c0ad95ba252301b87acd6ee6be108c486cf2f387ab4d4a06ea88f4974a` |
+| [src/octobot_market_making/constants.py](../src/octobot_market_making/constants.py) ([L21](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/constants.py#L21)) | Resolves distribution and config folders from the installed source package location. | `2e6b34874fdd4755d40621e004683ba367c6c46a8610a546f49fed9c49d2ae78` |
+| [src/octobot_market_making/config/default_config.json](../src/octobot_market_making/config/default_config.json) ([L23](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/src/octobot_market_making/config/default_config.json#L23)) | Sets profile/distribution to market_making, enables web notifications and includes backtesting file list. | `b25856fdd5e663386515b96d057e6862b67616fcc43231a952f66ab0ce467a01` |
+| [start.py](../start.py) ([L19](https://github.com/alexcwyu/OctoBot-Market-Making/blob/21e0d4c21b4f6460e36113d5254cab55a22108ec/start.py#L19)) | Imports distribution cli and invokes main under executable entry point. | `784a1024d36deb23402efae25bd1348ac5ce820e97d6ea3ae0b415696ab2c9cd` |
 
-## Further reading
+## Documentation provenance
 
-Use [development.md](development.md) for reproducible commands and [validation.md](validation.md) for exact interpreter, dependency, build, test, and blocker evidence. The equivalent [HTML architecture document](ayu-develop.html) supports browsing and rendered diagrams.
+Review date: 2026-10-13. Full committed source HEAD: `21e0d4c21b4f6460e36113d5254cab55a22108ec`. Template version: 2. 4 source files were independently hashed for this guide.
 
-Python 3.15 now builds with [the documented current native source and system-library settings](development.md#current-native-indicator-source). This repository’s own 1 original CLI case passes. The original assertions and API scope remain intact.
+[Evidence catalog](../../docs/systems-2026-10-13/catalog.json) / [Standard template](../../docs/guidelines/APP_TEMPLATE.md)
+
+- Read-only source audit of inventory HEAD 21e0d4c21b4f6460e36113d5254cab55a22108ec; no runtime execution, credential check or live-production assertion. Existing validation records remain separate historical evidence.
+- Inspected implementation/configuration coverage: src/octobot_market_making/cli.py, src/octobot_market_making/constants.py, src/octobot_market_making/config/default_config.json, start.py
+- Source symbols and call chains are representative coverage, not exhaustive connector, strategy or product certification. Integration statuses identify dependencies that supply the runtime behavior.
+- Independent review refinement: backtesting status is unverified, because a generic configuration key does not implement or prove replay for the bound market-making profile.

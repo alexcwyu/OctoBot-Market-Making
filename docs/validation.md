@@ -1,5 +1,11 @@
 # OctoBot-Market-Making: final Python 3.15 verification
 
+<!-- current-documentation-provenance -->
+Documentation reviewed: 2026-10-13 · Git source base: `21e0d4c21b4f6460e36113d5254cab55a22108ec` · [Current architecture and feature guide](ayu-develop.md).
+Historical execution commands/results below retain their original dates and scope; this metadata update is not a new application test run.
+<!-- /current-documentation-provenance -->
+
+
 Selected runtime: **managed Python 3.15.0**, uv **0.13.0**; source commit `ad8634ed21d9a5c5c6529ccf42516e58a3cd55a8`. Its own existing repository suite passed: **1 passed in 8.02s**. This is the original standalone repository suite, separately executed from the newer host's package suites. Source distribution and wheel builds, frozen synchronization and strict source compilation passed. No test cases, golden values or formulas changed.
 
 [Development and native prerequisites](development.md) · [Portable exact commands](maintenance/index.md) · [Machine-readable evidence](maintenance/verification.json). The locked adjacent licensed source and supported system-library configuration are explicit in the project metadata and development guide.
